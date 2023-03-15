@@ -1,6 +1,0 @@
-01 - This is an input file that will be processed and moved to output directory
-02 - This is an input file that will be processed and moved to output directory
-03 - This is an input file that will be processed and moved to output directory
-04 - This is an input file that will be processed and moved to output directory
-05 - This is an input file that will be processed and moved to output directory
-06 - This is an input file that will be processed and moved to output directory
