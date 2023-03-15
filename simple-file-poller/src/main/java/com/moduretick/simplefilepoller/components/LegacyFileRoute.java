@@ -1,5 +1,6 @@
 package com.moduretick.simplefilepoller.components;
 
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.dataformat.bindy.csv.BindyCsvDataFormat;
 import org.slf4j.Logger;
@@ -7,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.moduretick.simplefilepoller.beans.NameAddress;
+import com.moduretick.simplefilepoller.processors.InboundMessageProcessor;
 
 @Component
 public class LegacyFileRoute extends RouteBuilder {
@@ -21,11 +23,9 @@ public class LegacyFileRoute extends RouteBuilder {
 		.routeId("legacyFileMoveRouteId")
 		.split(body().tokenize("\n", 1, true))
 		.unmarshal(bindyDataFormat)
-		.process(exchange ->{
-			NameAddress fileData = exchange.getIn().getBody(NameAddress.class);
-			logger.info("This is the read fileData: " + fileData.toString());
-			exchange.getIn().setBody(fileData.toString());
-		})
+		.process(new InboundMessageProcessor())
+		.log(LoggingLevel.INFO, "Transformed Body: ${body}")
+		.convertBodyTo(String.class)
 		.to("file:src/data/output?fileName=outputFile.csv&fileExist=append&appendChars=\\n")
 		.end();
 		
