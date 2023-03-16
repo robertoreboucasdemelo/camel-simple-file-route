@@ -25,50 +25,23 @@ class LegacyFileRouteTest {
 	@Autowired
 	ProducerTemplate producerTemplate;
 
-	@Test
-	void testFileMove() throws Exception {
-		
-		// Setup the Mock
-		
-		String expectedBody = "This is an input file that will be processed and moved to output directory";
-		mockEndpoint.expectedBodiesReceived(expectedBody);
-		mockEndpoint.expectedMinimumMessageCount(1);
-		
-		
-		// Tweak the Route Definition
-		
-		AdviceWith.adviceWith(context, "legacyFileMoveRouteId", routeBuilder -> {
-			routeBuilder.weaveByToUri("file:*").replace().to(mockEndpoint);
-		});
-		
-		// Start the Context and Validate is Mock is Asserted
-		
-		context.start();
-		mockEndpoint.assertIsSatisfied();
-	}
 	
 	@Test
 	void testFileMoveByMockingFromEndpoint() throws Exception {
 		
-		// Setup the Mock
-		
-		String expectedBody = "This is an input file that will be processed and moved to output directory";
-		mockEndpoint.expectedBodiesReceived(expectedBody);
-		mockEndpoint.expectedMinimumMessageCount(1);
-		
-		
-		// Tweak the Route Definition
-		
-		AdviceWith.adviceWith(context, "legacyFileMoveRouteId", routeBuilder -> {
-			routeBuilder.replaceFromWith("direct:mockStart");
-			routeBuilder.weaveByToUri("file:*").replace().to(mockEndpoint);
-		});
-		
-		// Start the Context and Validate is Mock is Asserted
-		
-		context.start();
-		producerTemplate.sendBody("direct:mockStart" , expectedBody);
-		mockEndpoint.assertIsSatisfied();
+		String expectedBody = "OutboundNameAddress [name=Sam, address=12 Ajax, Ontario, L1S 2TR]";
+	    mockEndpoint.expectedBodiesReceived(expectedBody);
+	    mockEndpoint.expectedMinimumMessageCount(1);
+	 
+	    AdviceWith.adviceWith(context, "legacyFileMoveRouteId", routeBuilder -> {
+	        routeBuilder.replaceFromWith("direct:mockStart");
+	        routeBuilder.weaveByToUri("file:*").replace().to(mockEndpoint);
+	    });
+	 
+	    context.start();
+	    producerTemplate.sendBody("direct:mockStart", "name; house_number; city; province; postal_code\n" +
+	            "Sam;12;Ajax;Ontario;L1S 2TR");
+	    mockEndpoint.assertIsSatisfied();
 	}
 
 }
